@@ -316,7 +316,7 @@ export async function sendStatusChangeEmail(
         registrationId,
       );
 
-    case "rejected":
+    case "rejected": {
       // Determine rejection reason based on context
       const rejectedReason:
         | "deadline_missed"
@@ -329,6 +329,7 @@ export async function sendStatusChangeEmail(
         applicantName,
         registrationId,
       );
+    }
   }
 
   return false;

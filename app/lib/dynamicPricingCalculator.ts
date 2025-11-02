@@ -304,15 +304,33 @@ export class DynamicPricingCalculator {
     const { data: eventSettings, error } = await supabase
       .from("event_settings")
       .select("pricing_config")
-      .single();
+      .maybeSingle();
 
-    if (error || !eventSettings) {
-      throw new Error("Event settings not found");
+    // Handle missing event settings gracefully (for public endpoints)
+    if (error && error.code !== "PGRST116") {
+      // Real error (not just "no rows found")
+      throw new Error(`Failed to fetch event settings: ${error.message}`);
+    }
+
+    if (!eventSettings || !eventSettings.pricing_config) {
+      // Return default empty options when settings are not configured
+      return {
+        hotelChoices: ["no-accommodation"],
+        roomTypes: [],
+        allowInQuotaAfterEarlyBird: false,
+        isEarlyBird: false,
+      };
     }
 
     const pricingConfig = eventSettings.pricing_config as PricingConfig;
     if (!pricingConfig) {
-      throw new Error("Pricing configuration not found");
+      // Return default empty options when pricing config is missing
+      return {
+        hotelChoices: ["no-accommodation"],
+        roomTypes: [],
+        allowInQuotaAfterEarlyBird: false,
+        isEarlyBird: false,
+      };
     }
 
     // Check if current time is before early bird deadline

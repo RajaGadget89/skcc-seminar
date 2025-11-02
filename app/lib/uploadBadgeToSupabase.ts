@@ -147,7 +147,7 @@ export async function badgeExistsInSupabase(
       return false;
     }
 
-    return data.some((file) => file.name === finalFilename);
+    return data.some((file: { name: string }) => file.name === finalFilename);
   } catch (error) {
     console.error("Error in badgeExistsInSupabase:", error);
     return false;

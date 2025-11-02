@@ -44,15 +44,17 @@ export class GetEmailOutboxItems {
       }
 
       // Transform the data to match the expected contract
-      const items: EmailOutboxItem[] = (data || []).map((item) => ({
-        id: (item as any).id,
-        to: (item as any).to_email,
-        subject: (item as any).subject || "No subject",
-        status: (item as any).status,
-        created_at: (item as any).created_at,
-        updated_at: (item as any).updated_at,
-        error_message: (item as any).last_error || undefined,
-      }));
+      const items: EmailOutboxItem[] = (data || []).map(
+        (item: Record<string, unknown>) => ({
+          id: (item as any).id,
+          to: (item as any).to_email,
+          subject: (item as any).subject || "No subject",
+          status: (item as any).status,
+          created_at: (item as any).created_at,
+          updated_at: (item as any).updated_at,
+          error_message: (item as any).last_error || undefined,
+        }),
+      );
 
       return {
         items,

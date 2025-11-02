@@ -38,12 +38,12 @@ export async function GET(request: NextRequest) {
 
     const topEndpointsData = Object.entries(endpointCounts)
       .map(([endpoint, count]) => ({ endpoint, count }))
-      .sort((a, b) => b.count - a.count)
+      .sort((a, b) => (b.count as number) - (a.count as number))
       .slice(0, 10);
 
     const byApiKeyTypeData = Object.entries(apiKeyTypeCounts)
       .map(([api_key_type, count]) => ({ api_key_type, count }))
-      .sort((a, b) => b.count - a.count);
+      .sort((a, b) => (b.count as number) - (a.count as number));
 
     return NextResponse.json({
       topEndpoints: topEndpointsData,

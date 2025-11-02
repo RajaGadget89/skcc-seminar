@@ -785,8 +785,10 @@ export async function POST(request: NextRequest) {
           const pn = rawParticipantNumber || "";
           // If clearly non-unique or a group label (contains Thai words like 'หอการค้า' or spaces/parentheses without decimals),
           // or too short, use SEQ fallback.
+          // Move - to end of character class to avoid escape requirement
           const looksLikeGroup =
-            /หอการค้า|\(|\)|\s/.test(pn) && !/^\d+(?:[.\-]\d+)?$/.test(pn);
+            // eslint-disable-next-line no-useless-escape
+            /หอการค้า|[()]|\s/.test(pn) && !/^\d+(?:[.\-]\d+)?$/.test(pn);
           const tooShort = pn.length < 2;
           if (pn && !looksLikeGroup && !tooShort) return pn;
           // Use sheet sequence number if available, else the current loop index for stability

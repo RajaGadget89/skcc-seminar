@@ -103,6 +103,7 @@ function preprocessThaiText(text: string): string {
   processed = processed.replace(/[\u200B-\u200D\uFEFF]/g, "");
 
   // 5. Remove control characters
+  // eslint-disable-next-line no-control-regex
   processed = processed.replace(/[\u0000-\u001F\u007F-\u009F]/g, "");
 
   return processed;

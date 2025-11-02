@@ -12,18 +12,23 @@ if (!supabaseDomain) {
 
 const nextConfig: NextConfig = {
   reactStrictMode: true,
-  eslint: {
-    ignoreDuringBuilds: true,
-  },
   typescript: {
     ignoreBuildErrors: true,
   },
+  // Explicitly use webpack (we have custom webpack config for @react-email/render)
+  // Setting empty turbopack config tells Next.js 16 we're intentionally using webpack
+  turbopack: {},
   images: {
     remotePatterns: [
       ...(supabaseDomain ? [{
         protocol: 'https' as const,
         hostname: supabaseDomain,
       }] : []),
+      // Allow images from other Supabase projects (for cloned repos with existing assets)
+      {
+        protocol: 'https' as const,
+        hostname: 'lojocjxgznpmeprsirwr.supabase.co',
+      },
       {
         protocol: 'https' as const,
         hostname: 'example.com',

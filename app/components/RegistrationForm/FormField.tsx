@@ -962,7 +962,7 @@ export default function FormField({
           </div>
         );
 
-      case "tel":
+      case "tel": {
         const phoneValidation = value ? validateThaiPhoneNumber(value) : null;
         const isPhoneValid = value && value.length === 10 && !phoneValidation;
 
@@ -1022,6 +1022,7 @@ export default function FormField({
             )}
           </div>
         );
+      }
 
       case "email":
         return (

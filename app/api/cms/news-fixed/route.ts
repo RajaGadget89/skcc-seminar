@@ -55,27 +55,34 @@ export async function GET(request: NextRequest) {
 
     // Transform data to comprehensive format
     const comprehensiveNews =
-      news?.map((article) => ({
-        id: article.id,
-        headline: article.headline,
-        content: article.content,
-        language: article.language,
-        published_at: article.published_at,
-        image_url: article.image_url,
-        hashtags: article.hashtags || [],
-        created_at: article.created_at,
-        updated_at: article.updated_at,
-        is_active: article.is_active,
-        // Computed fields
-        url: `/news/${article.id}`,
-        full_url: `${process.env.NEXT_PUBLIC_SITE_URL || "https://yec-registration.com"}/news/${article.id}`,
-        is_published: article.is_active && article.published_at,
-        has_image: !!article.image_url,
-        hashtag_count: (article.hashtags || []).length,
-        reading_time_minutes: Math.ceil((article.content || "").length / 200), // Rough estimate
-        word_count: (article.content || "").split(" ").length,
-        excerpt: (article.content || "").substring(0, 200) + "...",
-      })) || [];
+      news?.map(
+        (article: {
+          id: string;
+          content?: string;
+          hashtags?: unknown[];
+          [key: string]: unknown;
+        }) => ({
+          id: article.id,
+          headline: article.headline,
+          content: article.content,
+          language: article.language,
+          published_at: article.published_at,
+          image_url: article.image_url,
+          hashtags: article.hashtags || [],
+          created_at: article.created_at,
+          updated_at: article.updated_at,
+          is_active: article.is_active,
+          // Computed fields
+          url: `/news/${article.id}`,
+          full_url: `${process.env.NEXT_PUBLIC_SITE_URL || "https://yec-registration.com"}/news/${article.id}`,
+          is_published: article.is_active && article.published_at,
+          has_image: !!article.image_url,
+          hashtag_count: (article.hashtags || []).length,
+          reading_time_minutes: Math.ceil((article.content || "").length / 200), // Rough estimate
+          word_count: (article.content || "").split(" ").length,
+          excerpt: (article.content || "").substring(0, 200) + "...",
+        }),
+      ) || [];
 
     return NextResponse.json({
       success: true,

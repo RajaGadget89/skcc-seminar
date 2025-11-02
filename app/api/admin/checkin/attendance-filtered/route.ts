@@ -175,7 +175,9 @@ export async function GET(req: NextRequest) {
       .not("yec_province", "is", null);
 
     const uniqueProvinces = [
-      ...new Set(provinces?.map((p) => p.yec_province) || []),
+      ...new Set(
+        provinces?.map((p: { yec_province: string }) => p.yec_province) || [],
+      ),
     ].sort();
 
     // Format the response

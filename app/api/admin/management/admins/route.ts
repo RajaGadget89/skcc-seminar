@@ -127,19 +127,26 @@ async function listAdmins(request: NextRequest): Promise<NextResponse> {
     const hasPrevPage = page > 1;
 
     return NextResponse.json({
-      admins: admins.map((admin) => ({
-        id: (admin as any).id,
-        email: (admin as any).email,
-        role: (admin as any).role,
-        ...(isAdminJobAssignmentEnabled() && {
-          business_roles: (admin as any).business_roles || [],
+      admins: admins.map(
+        (admin: {
+          id: string;
+          email: string;
+          role: string;
+          [key: string]: unknown;
+        }) => ({
+          id: (admin as any).id,
+          email: (admin as any).email,
+          role: (admin as any).role,
+          ...(isAdminJobAssignmentEnabled() && {
+            business_roles: (admin as any).business_roles || [],
+          }),
+          status: (admin as any).status,
+          created_at: (admin as any).created_at,
+          updated_at: (admin as any).updated_at,
+          last_login_at: (admin as any).last_login_at,
+          is_active: (admin as any).is_active,
         }),
-        status: (admin as any).status,
-        created_at: (admin as any).created_at,
-        updated_at: (admin as any).updated_at,
-        last_login_at: (admin as any).last_login_at,
-        is_active: (admin as any).is_active,
-      })),
+      ),
       pagination: {
         page,
         pageSize,

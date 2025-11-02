@@ -129,25 +129,31 @@ export async function GET(
         }
       : null;
 
-    const shapedEvents = (events || []).map((e) => {
-      const ev = Array.isArray(e.seminar_events)
-        ? e.seminar_events[0]
-        : (e.seminar_events as any);
-      return {
-        id: e.id,
-        registration_status: e.registration_status,
-        event: ev
-          ? {
-              id: ev.id,
-              name: ev.name,
-              event_date: ev.event_date,
-              event_time: ev.event_time,
-              description: ev.description,
-              location: ev.location,
-            }
-          : null,
-      };
-    });
+    const shapedEvents = (events || []).map(
+      (e: {
+        id: string;
+        registration_status: string;
+        seminar_events: unknown[];
+      }) => {
+        const ev = Array.isArray(e.seminar_events)
+          ? e.seminar_events[0]
+          : (e.seminar_events as any);
+        return {
+          id: e.id,
+          registration_status: e.registration_status,
+          event: ev
+            ? {
+                id: ev.id,
+                name: ev.name,
+                event_date: ev.event_date,
+                event_time: ev.event_time,
+                description: ev.description,
+                location: ev.location,
+              }
+            : null,
+        };
+      },
+    );
 
     return NextResponse.json({
       participant,

@@ -98,7 +98,9 @@ function AuthCallbackContent() {
                   payload.message ||
                   "Your admin access is suspended. Please contact an administrator.";
               }
-            } catch {}
+            } catch {
+              // Ignore error parsing, use default message
+            }
 
             if (code === "ACCOUNT_SUSPENDED") {
               // Treat as handled state: avoid red console error noise

@@ -346,7 +346,7 @@ export async function POST(request: NextRequest) {
         // Header row
         Object.keys(exportData[0] || {}).join(","),
         // Data rows
-        ...exportData.map((row) =>
+        ...exportData.map((row: Record<string, unknown>) =>
           Object.values(row)
             .map((value) =>
               typeof value === "string" && value.includes(",")
@@ -414,7 +414,11 @@ export async function GET(_request: NextRequest) {
 
     // Get unique provinces
     const provinces = [
-      ...new Set(participants?.map((p) => p.province).filter(Boolean)),
+      ...new Set(
+        participants
+          ?.map((p: { province: string }) => p.province)
+          .filter(Boolean),
+      ),
     ];
 
     // Get hotels
@@ -436,7 +440,11 @@ export async function GET(_request: NextRequest) {
       .not("payment_status", "is", null);
 
     const paymentStatuses = [
-      ...new Set(finances?.map((f) => f.payment_status).filter(Boolean)),
+      ...new Set(
+        finances
+          ?.map((f: { payment_status: string }) => f.payment_status)
+          .filter(Boolean),
+      ),
     ];
 
     // Define available columns
@@ -510,8 +518,8 @@ export async function GET(_request: NextRequest) {
       availableColumns,
       filterOptions: {
         provinces,
-        hotels: hotels?.map((h) => h.name) || [],
-        events: events?.map((e) => e.name) || [],
+        hotels: hotels?.map((h: { name: string }) => h.name) || [],
+        events: events?.map((e: { name: string }) => e.name) || [],
         paymentStatuses,
       },
       formats: [

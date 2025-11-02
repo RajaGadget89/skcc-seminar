@@ -26,7 +26,7 @@ export const validateRequired = (
 
 export const validatePhone = (phone: string): ValidationError | null => {
   if (!phone) return null; // Phone is optional
-  const phoneRegex = /^[\+]?[1-9][\d]{0,15}$/;
+  const phoneRegex = /^[+]?[1-9]\d{0,15}$/;
   if (!phoneRegex.test(phone.replace(/\s/g, ""))) {
     return { field: "phone", message: "Please enter a valid phone number" };
   }

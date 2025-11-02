@@ -28,7 +28,11 @@ export class AttendanceStats {
         .select("registration_id");
 
       const uniqueCheckedInUsers = uniqueCheckins
-        ? new Set(uniqueCheckins.map((c) => c.registration_id)).size
+        ? new Set(
+            uniqueCheckins.map(
+              (c: { registration_id: string }) => c.registration_id,
+            ),
+          ).size
         : 0;
 
       // Get First-Sight Badge Distribution (fallback to event type name if business_rule_category doesn't exist)

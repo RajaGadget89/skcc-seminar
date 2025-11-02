@@ -47,7 +47,7 @@ export async function POST(_request: NextRequest) {
     console.log(`✅ Found ${currentUsers.length} admin users`);
 
     // Step 2: Create backup (store in memory for this session)
-    const backup = currentUsers.map((user) => ({
+    const backup = currentUsers.map((user: Record<string, unknown>) => ({
       ...(user as any),
 
       backup_created_at: new Date().toISOString(),
@@ -57,11 +57,11 @@ export async function POST(_request: NextRequest) {
 
     // Step 3: Check if status column exists and add if needed
     const usersWithStatus = currentUsers.filter(
-      (user) =>
+      (user: Record<string, unknown>) =>
         (user as any).status !== null && (user as any).status !== undefined,
     );
     const usersWithoutStatus = currentUsers.filter(
-      (user) =>
+      (user: Record<string, unknown>) =>
         (user as any).status === null || (user as any).status === undefined,
     );
 
@@ -71,7 +71,7 @@ export async function POST(_request: NextRequest) {
 
     // Step 4: Update users without proper status
     const usersToUpdate = currentUsers.filter(
-      (user) =>
+      (user: Record<string, unknown>) =>
         (user as any).is_active === true &&
         ((user as any).status === null ||
           (user as any).status === undefined ||
@@ -86,9 +86,9 @@ export async function POST(_request: NextRequest) {
         stats: {
           total_users: currentUsers.length,
 
-          active_users: currentUsers.filter((u) => (u as any).is_active).length,
+          active_users: currentUsers.filter((u: Record<string, unknown>) => (u as any).is_active).length,
           users_with_proper_status: currentUsers.filter(
-            (u) => (u as any).is_active && (u as any).status === "active",
+            (u: Record<string, unknown>) => (u as any).is_active && (u as any).status === "active",
           ).length,
         },
         backup: backup,
@@ -98,7 +98,7 @@ export async function POST(_request: NextRequest) {
     console.log(`🔧 Updating ${usersToUpdate.length} users...`);
 
     // Update users in batches
-    const updatePromises = usersToUpdate.map(async (user) => {
+    const updatePromises = usersToUpdate.map(async (user: Record<string, unknown>) => {
       const { error: updateError } = await (supabase as any)
         .from("admin_users")
         .update({
@@ -157,7 +157,7 @@ export async function POST(_request: NextRequest) {
 
     const activeUsersWithProperStatus =
       updatedUsers?.filter(
-        (u) => (u as any).is_active && (u as any).status === "active",
+        (u: Record<string, unknown>) => (u as any).is_active && (u as any).status === "active",
       ) || [];
 
     console.log("✅ Migration completed successfully");
@@ -169,7 +169,7 @@ export async function POST(_request: NextRequest) {
         total_users: updatedUsers?.length || 0,
 
         active_users:
-          updatedUsers?.filter((u) => (u as any).is_active).length || 0,
+          updatedUsers?.filter((u: Record<string, unknown>) => (u as any).is_active).length || 0,
 
         active_users_with_proper_status: activeUsersWithProperStatus.length,
         users_updated: updateResults.length,
@@ -212,14 +212,14 @@ export async function GET() {
     const stats = {
       total_users: users?.length || 0,
 
-      active_users: users?.filter((u) => (u as any).is_active).length || 0,
-      active_users_with_proper_status:
+      active_users: users?.filter((u: Record<string, unknown>) => (u as any).is_active).length || 0,
+        active_users_with_proper_status:
         users?.filter(
-          (u) => (u as any).is_active && (u as any).status === "active",
+          (u: Record<string, unknown>) => (u as any).is_active && (u as any).status === "active",
         ).length || 0,
       users_without_status:
         users?.filter(
-          (u) => (u as any).status === null || (u as any).status === undefined,
+          (u: Record<string, unknown>) => (u as any).status === null || (u as any).status === undefined,
         ).length || 0,
     };
 

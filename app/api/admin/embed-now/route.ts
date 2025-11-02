@@ -36,7 +36,11 @@ export async function POST(request: NextRequest) {
 
     console.log(
       `[EMBED-NOW] Found ${jobs?.length || 0} pending jobs:`,
-      jobs?.map((j) => ({ id: j.id, type: j.type, action: j.action })),
+      jobs?.map((j: { id: string; type: string; action: string }) => ({
+        id: j.id,
+        type: j.type,
+        action: j.action,
+      })),
     );
 
     if (!jobs || jobs.length === 0) {

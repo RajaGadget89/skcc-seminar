@@ -178,11 +178,13 @@ export class PricingManagementService {
 
       const totalRegistrations = registrations?.length || 0;
       const earlyBirdRegistrations =
-        registrations?.filter((r) => r.is_early_bird).length || 0;
+        registrations?.filter(
+          (r: { is_early_bird: boolean }) => r.is_early_bird,
+        ).length || 0;
 
       // Coerce DB numeric/decimal (may arrive as string) to number before summing
       const totalRevenue =
-        registrations?.reduce((sum, r) => {
+        registrations?.reduce((sum: number, r: { price_applied: unknown }) => {
           const value = r.price_applied as unknown as number | string | null;
           const numeric =
             typeof value === "string" ? parseFloat(value) : value || 0;
@@ -201,16 +203,18 @@ export class PricingManagementService {
         noAccommodation: 0,
       };
 
-      registrations?.forEach((reg) => {
-        const packageCode = reg.selected_package_code;
-        if (packageCode === "out-of-quota") priceDistribution.outOfQuota++;
-        else if (packageCode === "in-quota-double")
-          priceDistribution.inQuotaDouble++;
-        else if (packageCode === "in-quota-single")
-          priceDistribution.inQuotaSingle++;
-        else if (packageCode === "no-accommodation")
-          priceDistribution.noAccommodation++;
-      });
+      registrations?.forEach(
+        (reg: { selected_package_code: string | null }) => {
+          const packageCode = reg.selected_package_code;
+          if (packageCode === "out-of-quota") priceDistribution.outOfQuota++;
+          else if (packageCode === "in-quota-double")
+            priceDistribution.inQuotaDouble++;
+          else if (packageCode === "in-quota-single")
+            priceDistribution.inQuotaSingle++;
+          else if (packageCode === "no-accommodation")
+            priceDistribution.noAccommodation++;
+        },
+      );
 
       return {
         totalRegistrations,

@@ -107,22 +107,26 @@ function extractTextForEmbedding(
   content: ContentData,
 ): string {
   switch (contentType) {
-    case "news":
+    case "news": {
       const news = content as NewsContent;
       return `${news.headline} ${news.content}`.trim();
+    }
 
-    case "pages":
+    case "pages": {
       const page = content as PageContent;
       const sectionsText = page.sections?.map((s) => s.content).join(" ") || "";
       return `${page.title} ${page.meta_description || ""} ${sectionsText}`.trim();
+    }
 
-    case "activities":
+    case "activities": {
       const activity = content as ActivityContent;
       return `${activity.title} ${activity.summary || ""} ${activity.content || ""}`.trim();
+    }
 
-    case "faq":
+    case "faq": {
       const faq = content as FAQContent;
       return `${faq.question} ${faq.answer}`.trim();
+    }
 
     default:
       return "";

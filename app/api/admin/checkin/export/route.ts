@@ -237,7 +237,7 @@ export async function GET(req: NextRequest) {
         const headers = Object.keys(exportData[0]);
         const csvContent = [
           headers.join(","),
-          ...exportData.map((row) =>
+          ...exportData.map((row: Record<string, unknown>) =>
             headers
               .map((header) => {
                 const value = (row as any)[header];

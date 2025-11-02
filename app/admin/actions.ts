@@ -297,8 +297,12 @@ export async function getProvinces(): Promise<string[]> {
     }
 
     const provinces = Array.from(
-      new Set(data?.map((r: any) => r.yec_province).filter(Boolean) || []),
-    );
+      new Set(
+        data
+          ?.map((r: { yec_province: string }) => r.yec_province)
+          .filter(Boolean) || [],
+      ),
+    ) as string[];
     return provinces.sort();
   } catch (error) {
     console.error("Unexpected error in getProvinces:", error);
@@ -375,7 +379,7 @@ export async function exportToCSV(filters: FilterState): Promise<string> {
 
     const csvRows = [
       headers.join(","),
-      ...registrations.map((registration) =>
+      ...registrations.map((registration: Registration) =>
         headers
           .map((header) => {
             const value = registration[header as keyof Registration];

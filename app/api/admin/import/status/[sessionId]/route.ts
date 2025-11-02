@@ -70,7 +70,10 @@ export async function GET(
       successfulRecords: session.successful_records,
       failedRecords: session.failed_records,
       currentBatch:
-        batches?.find((b) => b.status === "processing")?.batch_number || 0,
+        batches?.find(
+          (b: { status: string; batch_number: number }) =>
+            b.status === "processing",
+        )?.batch_number || 0,
       totalBatches: batches?.length || 0,
       currentOperation: getCurrentOperation(session.status, batches || []),
       estimatedCompletion: calculateEstimatedCompletion(session, batches || []),
@@ -106,20 +109,25 @@ export async function GET(
 
 function getCurrentOperation(status: string, batches: any[]): string {
   switch (status) {
-    case "processing":
+    case "processing": {
       const processingBatch = batches?.find((b) => b.status === "processing");
       if (processingBatch) {
         return `Processing batch ${processingBatch.batch_number}`;
       }
       return "Processing import...";
-    case "completed":
+    }
+    case "completed": {
       return "Import completed successfully";
-    case "failed":
+    }
+    case "failed": {
       return "Import failed";
-    case "rolled_back":
+    }
+    case "rolled_back": {
       return "Import rolled back";
-    default:
+    }
+    default: {
       return "Unknown status";
+    }
   }
 }
 

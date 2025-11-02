@@ -85,9 +85,10 @@ export async function GET(request: NextRequest) {
 
     // Get badge statistics
     const registrationsWithBadges =
-      registrations?.filter((r) => r.badge_url) || [];
+      registrations?.filter((r: { badge_url: string | null }) => r.badge_url) ||
+      [];
     const registrationsWithEmails =
-      registrations?.filter((r) => r.email_sent) || [];
+      registrations?.filter((r: { email_sent: boolean }) => r.email_sent) || [];
 
     // Get recent audit logs
     const { data: auditLogs, error: auditError } = await supabase

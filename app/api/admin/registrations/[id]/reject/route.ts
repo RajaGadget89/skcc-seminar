@@ -88,7 +88,9 @@ export async function POST(
       ) {
         rejectNote = body.rejectNote.trim();
       }
-    } catch {}
+    } catch {
+      // Ignore parsing errors, use default empty rejectNote
+    }
 
     // Stage 2: update_row
     stage = "update_row";

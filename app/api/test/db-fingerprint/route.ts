@@ -62,7 +62,7 @@ export async function GET(request: NextRequest) {
         .limit(5);
 
       if (!migrationsError && migrations) {
-        migrationsStatus = migrations.map((m) => ({
+        migrationsStatus = migrations.map((m: { version: string; name: string }) => ({
           version: (m as any).version,
           name: (m as any).name,
           statements_count: (m as any).statements?.length || 0,
@@ -150,7 +150,7 @@ export async function GET(request: NextRequest) {
         .not("update_reason", "is", null);
 
       if (reasons) {
-        reasons.forEach((reg) => {
+        reasons.forEach((reg: { update_reason: string }) => {
           const reason = (reg as any).update_reason;
 
           if (reason === "profile") {

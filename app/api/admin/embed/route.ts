@@ -102,7 +102,7 @@ export async function POST(request: NextRequest) {
     for (const contentType of types) {
       try {
         switch (contentType) {
-          case "news":
+          case "news": {
             const { data: news } = await supabase
               .from("cms_news")
               .select(
@@ -124,8 +124,9 @@ export async function POST(request: NextRequest) {
               );
             }
             break;
+          }
 
-          case "activities":
+          case "activities": {
             const { data: activities } = await supabase
               .from("cms_activity_cards")
               .select(
@@ -147,8 +148,9 @@ export async function POST(request: NextRequest) {
               );
             }
             break;
+          }
 
-          case "pages":
+          case "pages": {
             const { data: pages } = await supabase
               .from("cms_pages")
               .select(
@@ -169,8 +171,9 @@ export async function POST(request: NextRequest) {
               );
             }
             break;
+          }
 
-          case "faq":
+          case "faq": {
             const { data: groups } = await supabase
               .from("cms_faq_groups")
               .select(
@@ -200,6 +203,7 @@ export async function POST(request: NextRequest) {
               }
             }
             break;
+          }
         }
       } catch (error) {
         console.error(`Error processing ${contentType}:`, error);

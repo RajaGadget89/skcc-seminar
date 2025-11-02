@@ -25,7 +25,7 @@ export class StatusUpdateHandler implements EventHandler<RegistrationEvent> {
           );
           break;
 
-        case "admin.approved":
+        case "admin.approved": {
           // Update to approved status (this should be rare as triggers handle most cases)
 
           const { error: approveError } = await (supabase as any)
@@ -46,8 +46,9 @@ export class StatusUpdateHandler implements EventHandler<RegistrationEvent> {
             `Updated registration ${event.payload.registration.registration_id} status to approved`,
           );
           break;
+        }
 
-        case "admin.rejected":
+        case "admin.rejected": {
           // Update to rejected status without overwriting an existing rejected_reason
 
           // 1) Ensure status is rejected
@@ -89,8 +90,9 @@ export class StatusUpdateHandler implements EventHandler<RegistrationEvent> {
             `Updated registration ${event.payload.registration.registration_id} status to rejected; preserved existing rejected_reason if present`,
           );
           break;
+        }
 
-        case "document.reuploaded":
+        case "document.reuploaded": {
           // After re-upload, set status back to waiting_for_review
 
           const { error: reuploadError } = await (supabase as any)
@@ -112,8 +114,9 @@ export class StatusUpdateHandler implements EventHandler<RegistrationEvent> {
             `Updated registration ${event.payload.registration.registration_id} status to waiting_for_review after re-upload`,
           );
           break;
+        }
 
-        case "admin.review_track_updated":
+        case "admin.review_track_updated": {
           // Track updates are handled by database triggers
           // This handler just logs the event
           const trackPayload = event.payload as any; // Type assertion for track update event
@@ -121,8 +124,9 @@ export class StatusUpdateHandler implements EventHandler<RegistrationEvent> {
             `Track ${trackPayload.track} updated to ${trackPayload.track_status} for registration ${event.payload.registration.registration_id}`,
           );
           break;
+        }
 
-        case "auto_reject.sweep_completed":
+        case "auto_reject.sweep_completed": {
           // Auto-reject sweep results are handled by the sweep function
           // This handler just logs the event
           const autoRejectPayload = event.payload as any; // Type assertion for auto-reject event
@@ -130,6 +134,7 @@ export class StatusUpdateHandler implements EventHandler<RegistrationEvent> {
             `Auto-reject sweep completed, ${autoRejectPayload.rejected_registrations?.length || 0} registrations rejected`,
           );
           break;
+        }
 
         default:
           console.log(
