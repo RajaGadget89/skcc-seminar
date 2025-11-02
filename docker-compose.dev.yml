@@ -9,7 +9,7 @@ services:
       dockerfile: Dockerfile.dev
     container_name: yec-dev
     ports:
-      - "8080:8080" # Localhost:8080 → Container:3000
+      - "7070:7070" # Localhost:7070 → Container7070
     volumes:
       - .:/app       # Hot reload
       - /app/node_modules # Exclude local node_modules
@@ -18,5 +18,5 @@ services:
     environment:
       - NODE_ENV=development
       - HOSTNAME=0.0.0.0
-      - PORT=8080
+      - PORT=7070
     restart: unless-stopped

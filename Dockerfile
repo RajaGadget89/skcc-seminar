@@ -17,5 +17,5 @@ COPY --from=build /app/.next ./.next
 COPY --from=build /app/package*.json ./
 COPY --from=build /app/next.config.js ./
 ENV NODE_ENV=production
-EXPOSE 3000
+EXPOSE 7070
 CMD ["npm", "start"]

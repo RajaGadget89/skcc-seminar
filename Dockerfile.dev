@@ -32,7 +32,7 @@ RUN npm install
 COPY . .
 
 # Port ที่ Next.js ใช้
-EXPOSE 3000
+EXPOSE 7070
 
 # รันเซิร์ฟเวอร์ Development
 CMD ["npm", "run", "dev"]
