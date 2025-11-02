@@ -5,8 +5,20 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 import type { Database } from "../types/database";
 import { assertDbRouting, logDbRouting } from "./env-guards";
 
-// Validate database routing on module load (development only)
-if (typeof window === "undefined" && process.env.NODE_ENV === "development") {
+// Validate database routing on module load (development only, skip during build)
+// During build phase, env vars may not be available, so skip validation
+const isBuildPhase =
+  process.env.NEXT_PHASE === "phase-production-build" ||
+  process.env.NEXT_PHASE === "phase-development-build" ||
+  (typeof process.env.NODE_ENV !== "undefined" &&
+    !process.env.NEXT_PUBLIC_SUPABASE_URL &&
+    !process.env.SUPABASE_URL);
+
+if (
+  typeof window === "undefined" &&
+  process.env.NODE_ENV === "development" &&
+  !isBuildPhase
+) {
   try {
     assertDbRouting();
     logDbRouting();
@@ -15,7 +27,10 @@ if (typeof window === "undefined" && process.env.NODE_ENV === "development") {
       "Database routing validation failed:",
       error instanceof Error ? error.message : String(error),
     );
-    process.exit(1);
+    // Only exit in development, not during build
+    if (!isBuildPhase) {
+      process.exit(1);
+    }
   }
 }
 

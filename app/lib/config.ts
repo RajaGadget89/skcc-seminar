@@ -29,8 +29,20 @@ export interface AppConfig {
   };
 }
 
+// Check if we're in build phase (Next.js builds don't have env vars)
+const isBuildPhase =
+  process.env.NEXT_PHASE === "phase-production-build" ||
+  process.env.NEXT_PHASE === "phase-development-build" ||
+  (typeof process.env.NODE_ENV !== "undefined" &&
+    !process.env.NEXT_PUBLIC_SUPABASE_URL);
+
 function getRequiredEnvVar(name: string): string {
   const value = process.env[name];
+  // During build phase, return placeholder to allow build to complete
+  // Validation will happen at runtime when actually used
+  if (isBuildPhase && !value) {
+    return `__PLACEHOLDER_${name}__`;
+  }
   if (!value) {
     throw new Error(`Required environment variable ${name} is not set`);
   }
@@ -40,9 +52,12 @@ function getRequiredEnvVar(name: string): string {
 function getOptionalEnvVar(name: string): string | null {
   const value = process.env[name];
   if (!value) {
-    console.warn(
-      `Optional environment variable ${name} is not set - some features will be disabled`,
-    );
+    // Only warn at runtime, not during build
+    if (!isBuildPhase) {
+      console.warn(
+        `Optional environment variable ${name} is not set - some features will be disabled`,
+      );
+    }
   }
   return value || null;
 }
@@ -75,41 +90,74 @@ export function getBaseUrl(): string {
   return getAppUrl();
 }
 
-export const config: AppConfig = {
-  supabase: {
-    url: getRequiredEnvVar("NEXT_PUBLIC_SUPABASE_URL"),
-    serviceRoleKey: getRequiredEnvVar("SUPABASE_SERVICE_ROLE_KEY"),
-  },
+// Lazy-loaded config - only evaluated when accessed, not at module load time
+let _config: AppConfig | null = null;
 
-  email: {
-    resendApiKey: getOptionalEnvVar("RESEND_API_KEY"),
-    fromEmail: getOptionalEnvVar("EMAIL_FROM"),
-    replyToEmail: getOptionalEnvVar("REPLY_TO_EMAIL"),
-  },
+function getConfig(): AppConfig {
+  if (!_config) {
+    _config = {
+      supabase: {
+        url: getRequiredEnvVar("NEXT_PUBLIC_SUPABASE_URL"),
+        serviceRoleKey: getRequiredEnvVar("SUPABASE_SERVICE_ROLE_KEY"),
+      },
 
-  telegram: {
-    botToken: getOptionalEnvVar("TELEGRAM_BOT_TOKEN"),
-    chatId: getOptionalEnvVar("TELEGRAM_CHAT_ID"),
-  },
+      email: {
+        resendApiKey: getOptionalEnvVar("RESEND_API_KEY"),
+        fromEmail: getOptionalEnvVar("EMAIL_FROM"),
+        replyToEmail: getOptionalEnvVar("REPLY_TO_EMAIL"),
+      },
 
-  app: {
-    url: getAppUrl(),
+      telegram: {
+        botToken: getOptionalEnvVar("TELEGRAM_BOT_TOKEN"),
+        chatId: getOptionalEnvVar("TELEGRAM_CHAT_ID"),
+      },
+
+      app: {
+        url: getAppUrl(),
+      },
+    };
+
+    // Validate that required vars are not placeholders (runtime validation only, skip during build)
+    if (!isBuildPhase) {
+      if (_config.supabase.url.startsWith("__PLACEHOLDER_")) {
+        throw new Error(
+          `Required environment variable NEXT_PUBLIC_SUPABASE_URL is not set`,
+        );
+      }
+      if (_config.supabase.serviceRoleKey.startsWith("__PLACEHOLDER_")) {
+        throw new Error(
+          `Required environment variable SUPABASE_SERVICE_ROLE_KEY is not set`,
+        );
+      }
+    }
+
+    // Log configuration status on first access (runtime only)
+    if (!isBuildPhase) {
+      console.log("App configuration loaded:", {
+        hasSupabase: !!_config.supabase.url,
+        hasEmail: !!(_config.email.resendApiKey && _config.email.fromEmail),
+        hasTelegram: !!(_config.telegram.botToken && _config.telegram.chatId),
+        hasAppUrl: !!_config.app.url,
+      });
+    }
+  }
+  return _config;
+}
+
+// Export config as a getter to ensure lazy loading
+export const config: AppConfig = new Proxy({} as AppConfig, {
+  get(_target, prop) {
+    return getConfig()[prop as keyof AppConfig];
   },
-};
+});
 
 // Validation helpers
 export const hasEmailConfig = (): boolean => {
-  return !!(config.email.resendApiKey && config.email.fromEmail);
+  const cfg = getConfig();
+  return !!(cfg.email.resendApiKey && cfg.email.fromEmail);
 };
 
 export const hasTelegramConfig = (): boolean => {
-  return !!(config.telegram.botToken && config.telegram.chatId);
+  const cfg = getConfig();
+  return !!(cfg.telegram.botToken && cfg.telegram.chatId);
 };
-
-// Log configuration status on module load
-console.log("App configuration loaded:", {
-  hasSupabase: !!config.supabase.url,
-  hasEmail: hasEmailConfig(),
-  hasTelegram: hasTelegramConfig(),
-  hasAppUrl: !!config.app.url,
-});
