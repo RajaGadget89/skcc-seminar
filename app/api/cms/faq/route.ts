@@ -207,13 +207,15 @@ export async function GET(request: NextRequest) {
           // Add group-level metadata
           total_items: enhancedItems.length,
           total_views: enhancedItems.reduce(
-            (sum, item) => sum + (item.view_count || 0),
+            (sum: number, item: { view_count?: number }) =>
+              sum + (item.view_count || 0),
             0,
           ),
           average_helpfulness:
             enhancedItems.length > 0
               ? enhancedItems.reduce(
-                  (sum, item) => sum + (item.helpful_ratio || 0),
+                  (sum: number, item: { helpful_ratio?: number }) =>
+                    sum + (item.helpful_ratio || 0),
                   0,
                 ) / enhancedItems.length
               : null,

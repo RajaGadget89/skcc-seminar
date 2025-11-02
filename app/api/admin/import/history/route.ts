@@ -33,16 +33,27 @@ export async function GET(request: NextRequest) {
     }
 
     // Transform sessions data
-    const transformedSessions = sessions.map((session) => ({
-      id: session.id,
-      filename: session.csv_filename,
-      status: session.status,
-      totalRecords: session.total_records,
-      successfulRecords: session.successful_records,
-      failedRecords: session.failed_records,
-      createdAt: session.created_at,
-      completedAt: session.completed_at,
-    }));
+    const transformedSessions = sessions.map(
+      (session: {
+        id: string;
+        csv_filename: string;
+        status: string;
+        total_records: number;
+        successful_records: number;
+        failed_records: number;
+        created_at: string;
+        completed_at: string | null;
+      }) => ({
+        id: session.id,
+        filename: session.csv_filename,
+        status: session.status,
+        totalRecords: session.total_records,
+        successfulRecords: session.successful_records,
+        failedRecords: session.failed_records,
+        createdAt: session.created_at,
+        completedAt: session.completed_at,
+      }),
+    );
 
     return NextResponse.json({
       success: true,

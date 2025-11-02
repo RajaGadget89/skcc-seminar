@@ -76,7 +76,7 @@ export class AdminsService {
     }
 
     return {
-      admins: (admins || []).map((admin) => ({
+      admins: (admins || []).map((admin: Record<string, unknown>) => ({
         ...(admin as any),
         business_roles: (admin as any).business_roles || [],
       })),

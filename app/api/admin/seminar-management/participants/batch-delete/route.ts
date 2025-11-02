@@ -53,7 +53,7 @@ export async function POST(request: NextRequest) {
       .select("id")
       .in("participant_id", participantIds);
 
-    const accommodationIds = (accs || []).map((a) => a.id);
+    const accommodationIds = (accs || []).map((a: { id: string }) => a.id);
 
     // Delete child tables first
     if (accommodationIds.length > 0) {

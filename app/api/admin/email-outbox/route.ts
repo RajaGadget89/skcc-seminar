@@ -159,15 +159,25 @@ async function getEmailOutbox(request: NextRequest): Promise<NextResponse> {
     }
 
     // Transform API response to match frontend interface
-    const transformedItems = (emails || []).map((email) => ({
-      id: email.id,
-      to: email.to_email, // Map to_email to to
-      subject: email.subject,
-      status: email.status,
-      created_at: email.created_at,
-      updated_at: email.updated_at,
-      error_message: email.error_message,
-    }));
+    const transformedItems = (emails || []).map(
+      (email: {
+        id: string;
+        to_email: string;
+        subject: string;
+        status: string;
+        created_at: string;
+        updated_at: string;
+        error_message: string | null;
+      }) => ({
+        id: email.id,
+        to: email.to_email, // Map to_email to to
+        subject: email.subject,
+        status: email.status,
+        created_at: email.created_at,
+        updated_at: email.updated_at,
+        error_message: email.error_message,
+      }),
+    );
 
     return NextResponse.json({
       ok: true,

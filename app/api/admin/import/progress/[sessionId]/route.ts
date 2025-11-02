@@ -54,7 +54,10 @@ export async function GET(
 
     // Calculate progress metrics
     const currentBatch =
-      batches?.find((b) => b.status === "processing")?.batch_number || 0;
+      batches?.find(
+        (b: { status: string; batch_number: number }) =>
+          b.status === "processing",
+      )?.batch_number || 0;
     const totalBatches = batches?.length || 0;
     const processedRecords = session.processed_records || 0;
     const successfulRecords = session.successful_records || 0;

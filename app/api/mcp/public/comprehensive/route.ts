@@ -56,7 +56,9 @@ export async function GET(request: NextRequest) {
           .map((t) => t.trim())
           .filter(Boolean)
       : enabledTypes;
-    const contentTypes = requestedTypes.filter((t) => enabledTypes.includes(t));
+    const contentTypes = requestedTypes.filter((t: string) =>
+      enabledTypes.includes(t),
+    );
 
     // Cache key respects query + content types
     const cacheKey = `mcp:public:comprehensive:${contentTypes.join(",")}:lang=${language}:q=${search}:meta=${include_metadata}:rel=${include_related}`;

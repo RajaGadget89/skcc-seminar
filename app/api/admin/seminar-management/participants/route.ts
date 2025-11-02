@@ -291,7 +291,7 @@ export async function GET(request: NextRequest) {
 
     // Transform data for frontend
     const transformedParticipants =
-      participants?.map((participant) => ({
+      participants?.map((participant: any) => ({
         id: participant.id,
         checker_reference_id: participant.checker_reference_id,
         participant_number: participant.participant_number,

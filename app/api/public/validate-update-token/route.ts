@@ -59,7 +59,7 @@ export async function GET(request: NextRequest) {
       .digest("hex");
 
     const tokenRecords = allTokens.find(
-      (t) => t.token_hash === providedTokenHash,
+      (t: { token_hash: string }) => t.token_hash === providedTokenHash,
     );
 
     if (!tokenRecords) {

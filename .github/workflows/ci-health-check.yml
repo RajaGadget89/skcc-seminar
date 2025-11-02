@@ -51,7 +51,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 18
           cache: npm
       - run: npm ci
       - run: npx playwright install --with-deps
@@ -63,7 +63,7 @@ jobs:
           
       - name: Run health validation tests
         run: |
-          npx playwright test tests/e2e/ci-health-check.spec.ts \
+          npx playwright test ci-health-check.spec.ts \
             --config=playwright.ci-health.config.ts \
             --reporter=line \
             --timeout=30000

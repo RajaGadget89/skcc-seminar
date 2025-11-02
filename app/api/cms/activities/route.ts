@@ -159,8 +159,12 @@ export async function GET(request: NextRequest) {
         total_activities: enhancedActivities.length,
         page,
         limit,
-        upcoming_count: enhancedActivities.filter((a) => a.is_upcoming).length,
-        ongoing_count: enhancedActivities.filter((a) => a.is_ongoing).length,
+        upcoming_count: enhancedActivities.filter(
+          (a: { is_upcoming: boolean }) => a.is_upcoming,
+        ).length,
+        ongoing_count: enhancedActivities.filter(
+          (a: { is_ongoing: boolean }) => a.is_ongoing,
+        ).length,
         language,
         search,
         include_metadata,

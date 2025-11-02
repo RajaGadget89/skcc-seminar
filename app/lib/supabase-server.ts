@@ -94,6 +94,19 @@ export function getMiddlewareSupabase(req: NextRequest) {
  * for operations that require elevated privileges
  */
 export function getSupabaseServiceClient() {
+  // During build phase, env vars may not be available - return a mock client
+  // that will fail gracefully at runtime if actually used
+  if (isBuildPhase) {
+    // Return a proxy that throws a helpful error if methods are called during build
+    return new Proxy({} as any, {
+      get() {
+        throw new Error(
+          "Supabase client cannot be used during build phase. Environment variables are not available.",
+        );
+      },
+    });
+  }
+
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
@@ -115,6 +128,19 @@ export function getSupabaseServiceClient() {
  * for server-side authorization checks
  */
 export function getServiceRoleClient() {
+  // During build phase, env vars may not be available - return a mock client
+  // that will fail gracefully at runtime if actually used
+  if (isBuildPhase) {
+    // Return a proxy that throws a helpful error if methods are called during build
+    return new Proxy({} as any, {
+      get() {
+        throw new Error(
+          "Supabase client cannot be used during build phase. Environment variables are not available.",
+        );
+      },
+    });
+  }
+
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 

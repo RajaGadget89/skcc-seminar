@@ -70,7 +70,10 @@ export async function GET(
       successfulRecords: session.successful_records,
       failedRecords: session.failed_records,
       currentBatch:
-        batches?.find((b) => b.status === "processing")?.batch_number || 0,
+        batches?.find(
+          (b: { status: string; batch_number: number }) =>
+            b.status === "processing",
+        )?.batch_number || 0,
       totalBatches: batches?.length || 0,
       currentOperation: getCurrentOperation(session.status, batches || []),
       estimatedCompletion: calculateEstimatedCompletion(session, batches || []),

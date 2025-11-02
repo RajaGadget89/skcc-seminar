@@ -84,7 +84,9 @@ export async function GET(request: NextRequest) {
       return out;
     };
 
-    const items = (data || []).map((row) => pick(baseItem(row)));
+    const items = (data || []).map((row: Record<string, unknown>) =>
+      pick(baseItem(row)),
+    );
 
     return NextResponse.json({
       success: true,

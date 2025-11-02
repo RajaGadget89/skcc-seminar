@@ -111,7 +111,8 @@ export async function verifyStorageBuckets(): Promise<{
       };
     }
 
-    const existingBucketNames = buckets?.map((b) => b.name) || [];
+    const existingBucketNames =
+      buckets?.map((b: { name: string }) => b.name) || [];
 
     // Check each required bucket
     for (const bucketConfig of REQUIRED_BUCKETS) {

@@ -50,20 +50,26 @@ export async function GET(request: NextRequest) {
 
     // Transform data to comprehensive format
     const comprehensivePages =
-      pages?.map((page) => ({
-        id: page.id,
-        title: page.title,
-        slug: page.slug,
-        meta_description: page.meta_description,
-        language: page.language,
-        is_active: page.is_active,
-        updated_at: page.updated_at,
-        // Computed fields
-        url: `/pages/${page.slug}`,
-        full_url: `${process.env.NEXT_PUBLIC_SITE_URL || "https://yec-registration.com"}/pages/${page.slug}`,
-        has_description: !!page.meta_description,
-        description_length: (page.meta_description || "").length,
-      })) || [];
+      pages?.map(
+        (page: {
+          id: string;
+          meta_description?: string;
+          [key: string]: unknown;
+        }) => ({
+          id: page.id,
+          title: page.title,
+          slug: page.slug,
+          meta_description: page.meta_description,
+          language: page.language,
+          is_active: page.is_active,
+          updated_at: page.updated_at,
+          // Computed fields
+          url: `/pages/${page.slug}`,
+          full_url: `${process.env.NEXT_PUBLIC_SITE_URL || "https://yec-registration.com"}/pages/${page.slug}`,
+          has_description: !!page.meta_description,
+          description_length: (page.meta_description || "").length,
+        }),
+      ) || [];
 
     return NextResponse.json({
       success: true,

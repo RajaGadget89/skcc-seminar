@@ -318,15 +318,15 @@ export async function GET(request: NextRequest) {
 
     // Transform data for RAG consumption
     const results =
-      participants?.map((participant) => {
+      participants?.map((participant: any) => {
         // Extract accommodation info
         const accommodation = participant.seminar_accommodations?.[0];
         const hotel = accommodation?.seminar_hotels?.[0];
 
         // Extract events with attendance tracking
         const events = participant.seminar_event_participants
-          ?.map((ep) => {
-            const ev = ep.seminar_events?.[0];
+          ?.map((ep: Record<string, unknown>) => {
+            const ev = (ep.seminar_events as any)?.[0];
             return {
               name: ev?.name,
               date: ev?.event_date,
@@ -337,12 +337,12 @@ export async function GET(request: NextRequest) {
               checked_in_at: ep.checked_in_at,
             };
           })
-          .filter((e) => e.name);
+          .filter((e: { name: unknown }) => e.name);
 
         // Extract transportation
         const transportation = participant.seminar_transportation?.reduce(
-          (acc, t) => {
-            acc[t.direction] = {
+          (acc: Record<string, unknown>, t: Record<string, unknown>) => {
+            acc[t.direction as string] = {
               type: t.transport_type,
               details: t.details,
             };

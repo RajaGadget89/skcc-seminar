@@ -88,11 +88,13 @@ export async function POST(
     console.log("[PUBLIC_UPDATE_API] Token matching:", {
       providedTokenHash: providedTokenHash.substring(0, 10) + "...",
       totalTokensFound: allTokens.length,
-      tokenHashes: allTokens.map((t) => t.token_hash.substring(0, 10) + "..."),
+      tokenHashes: allTokens.map(
+        (t: { token_hash: string }) => t.token_hash.substring(0, 10) + "...",
+      ),
     });
 
     const tokenRecord = allTokens.find(
-      (t) => t.token_hash === providedTokenHash,
+      (t: { token_hash: string }) => t.token_hash === providedTokenHash,
     );
 
     if (!tokenRecord) {
