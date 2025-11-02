@@ -10,6 +10,12 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
+# Add permissions for GitHub status updates
+permissions:
+  contents: read
+  pull-requests: write
+  statuses: write
+
 jobs:
   health_check:
     name: System Health Validation
@@ -45,7 +51,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: 18
+          node-version: 20
           cache: npm
       - run: npm ci
       - run: npx playwright install --with-deps

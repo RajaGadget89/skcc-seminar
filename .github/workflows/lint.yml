@@ -5,6 +5,12 @@ on:
   push:
     branches: [main, develop]
 
+# Add permissions for GitHub status updates
+permissions:
+  contents: read
+  pull-requests: write
+  statuses: write
+
 jobs:
   lint:
     name: lint
@@ -13,7 +19,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: 18
+          node-version: 20
           cache: npm
       - run: npm ci
 

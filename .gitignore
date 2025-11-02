@@ -12,6 +12,7 @@ docker-compose.local.yml
 Dockerfile.dev
 Dockerfile
 
+
 # ========================================
 # Next.js & Build Artifacts
 # ========================================
@@ -67,9 +68,19 @@ playwright/
 /test-*.sh
 app/api/test/
 app/api/test-simple/
+
+# ========================================
+# Tests - Ignore most, but allow CI health check
+# ========================================
+# Ignore all tests by default
 tests/
-migrations/
 e2e/
+
+# BUT: Allow the CI health check test file (required for CI)
+!tests/e2e/ci-health-check.spec.ts
+
+# Ignore test artifacts and results
+migrations/
 supabase/migrations/
 migrations/
 .cursor/plans/

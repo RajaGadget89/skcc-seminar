@@ -5,11 +5,12 @@ on:
   push:
     branches: [ main ]
 
-# ✅ ให้ GITHUB_TOKEN เขียนคอมเมนต์/PR ได้
+# ✅ ให้ GITHUB_TOKEN เขียนคอมเมนต์/PR และ status ได้
 permissions:
   contents: read
   pull-requests: write
   issues: write
+  statuses: write
 
 jobs:
   # === Preview (PR) ===
@@ -29,12 +30,12 @@ jobs:
       cancel-in-progress: true
     steps:
       - name: 🧱 Checkout Code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: 🔧 Setup Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
-          node-version: 18
+          node-version: 20
 
       - name: 🧰 Install system deps for canvas
         run: |
@@ -108,11 +109,11 @@ jobs:
       RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
     steps:
       - name: 🧱 Checkout Code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: 🔧 Setup Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
-          node-version: 18
+          node-version: 20
       - name: 🧰 Install system deps for canvas
         run: |
           sudo apt-get update
