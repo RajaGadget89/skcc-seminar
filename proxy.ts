@@ -31,19 +31,19 @@ async function getCurrentUserFromCookie(email: string | undefined): Promise<{is_
     }
     
     // Fall back to RBAC system when database is unavailable
-    console.log(`[auth-debug] middleware: database query failed for ${email}, falling back to RBAC`);
+    console.log(`[auth-debug] proxy: database query failed for ${email}, falling back to RBAC`);
     const { getRolesForEmail } = await import("./app/lib/rbac");
     const roles = getRolesForEmail(email);
     
     if (roles.size > 0) {
-      console.log(`[auth-debug] middleware: RBAC fallback successful for ${email}, roles:`, Array.from(roles));
+      console.log(`[auth-debug] proxy: RBAC fallback successful for ${email}, roles:`, Array.from(roles));
       return {
         is_active: true,
         role: roles.has("super_admin") ? "super_admin" : "admin"
       };
     }
     
-    console.log(`[auth-debug] middleware: RBAC fallback failed for ${email}, no roles found`);
+    console.log(`[auth-debug] proxy: RBAC fallback failed for ${email}, no roles found`);
     return null;
   } catch {
     return null;
@@ -81,17 +81,19 @@ async function checkUserAdminStatus(email: string | undefined): Promise<boolean>
 }
 
 /**
- * Middleware to protect admin routes
+ * Proxy to protect admin routes (formerly middleware)
  * Checks for Supabase session to authorize access
  * UNIFIED: Now uses same auth logic as page guard (getCurrentUser)
+ * 
+ * Next.js 16: Renamed from middleware.ts to proxy.ts per Next.js 16 conventions
  */
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   // Debug: Add header at the very beginning
   const response = NextResponse.next();
-  response.headers.set('x-debug-start', 'middleware-started');
+  response.headers.set('x-debug-start', 'proxy-started');
   
-  console.log('[middleware] EXECUTING middleware for:', request.url);
-  console.log('[middleware] Environment check:', {
+  console.log('[proxy] EXECUTING proxy for:', request.url);
+  console.log('[proxy] Environment check:', {
     hasSupabaseUrl: !!process.env.SUPABASE_URL,
     hasNextPublicSupabaseUrl: !!process.env.NEXT_PUBLIC_SUPABASE_URL,
     hasSupabaseAnonKey: !!process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
@@ -113,14 +115,14 @@ export async function middleware(request: NextRequest) {
   // Exclude diagnostic paths from all auth checks
   if (pathname.startsWith('/api/diag/')) {
     if (AUTH_TRACE) {
-      console.log(`[auth-debug] middleware: allowing diagnostic path ${pathname}`);
+      console.log(`[auth-debug] proxy: allowing diagnostic path ${pathname}`);
     }
     return NextResponse.next();
   }
   
   if (AUTH_TRACE) {
     const cookieNames = Array.from(request.cookies.getAll()).map(c => c.name);
-    console.log(`[auth-debug] middleware: path=${pathname}, cookies=[${cookieNames.join(', ')}], origin=${request.headers.get('origin') || 'none'}`);
+    console.log(`[auth-debug] proxy: path=${pathname}, cookies=[${cookieNames.join(', ')}], origin=${request.headers.get('origin') || 'none'}`);
   }
   
   // Allowlist paths that should bypass admin protection
@@ -141,7 +143,7 @@ export async function middleware(request: NextRequest) {
   for (const allowedPath of allowlistPaths) {
     if (pathname.startsWith(allowedPath)) {
       if (AUTH_TRACE) {
-        console.log(`[auth-debug] middleware: allowing path (${allowedPath})`);
+        console.log(`[auth-debug] proxy: allowing path (${allowedPath})`);
       }
       return NextResponse.next();
     }
@@ -150,7 +152,7 @@ export async function middleware(request: NextRequest) {
   // Check for static assets
   if (/\.(ico|png|jpg|jpeg|gif|svg|css|js|map|woff|woff2|ttf|eot)$/.test(pathname)) {
     if (AUTH_TRACE) {
-      console.log(`[auth-debug] middleware: allowing static asset`);
+      console.log(`[auth-debug] proxy: allowing static asset`);
     }
     return NextResponse.next();
   }
@@ -163,7 +165,7 @@ export async function middleware(request: NextRequest) {
     // 1. Feature Flag Check: if disabled → return 403
     if (!isAdminManagementEnabled()) {
       if (AUTH_TRACE) {
-        console.log(`[auth-debug] middleware: feature flag disabled`);
+        console.log(`[auth-debug] proxy: feature flag disabled`);
       }
       const forbiddenResponse = new NextResponse("Feature not available", { status: 403 });
       forbiddenResponse.headers.set('x-admin-guard', 'deny:feature-flag-off');
@@ -180,14 +182,14 @@ export async function middleware(request: NextRequest) {
       const authCookieName = `sb-${projectRef}-auth-token`;
       const authCookie = request.cookies.get(authCookieName)?.value;
       
-      console.log('[middleware] Cookie debug:', {
+      console.log('[proxy] Cookie debug:', {
         hasAuthCookie: !!authCookie,
         authCookieName: authCookieName,
         authCookieValue: authCookie?.substring(0, 50) + '...',
       });
       
       if (authCookie) {
-        console.log('[middleware] Found auth cookie, attempting to parse');
+        console.log('[proxy] Found auth cookie, attempting to parse');
         
         // Parse the cookie using the same logic as /api/admin/me
         const b64 = authCookie.startsWith("base64-") ? authCookie.slice(7) : authCookie;
@@ -233,11 +235,11 @@ export async function middleware(request: NextRequest) {
         }
       }
     } catch (error) {
-      console.log('[middleware] Cookie parsing error (non-fatal):', error);
+      console.log('[proxy] Cookie parsing error (non-fatal):', error);
       // Continue without session - this is expected for malformed cookies
     }
     
-    console.log('[middleware] Session debug:', {
+    console.log('[proxy] Session debug:', {
       hasSession: !!session,
       sessionError: sessionError?.message,
       sessionUser: session?.user?.email
@@ -248,8 +250,8 @@ export async function middleware(request: NextRequest) {
     let isUserActive: boolean = false;
     let authMethod: 'supabase-session' | 'admin-email-cookie' | 'checker-email-cookie' | 'none' = 'none';
     
-    // Debug: Track middleware execution
-    response.headers.set('x-debug-middleware', 'executing');
+    // Debug: Track proxy execution
+    response.headers.set('x-debug-proxy', 'executing');
 
     if (!sessionError && session) {
       // Debug: Track Supabase session path
@@ -299,7 +301,7 @@ export async function middleware(request: NextRequest) {
       // Debug: Add header to track cookie detection
       response.headers.set('x-debug-admin-email', adminEmail ? 'found' : 'not-found');
       if (adminEmail) {
-        console.log(`[auth-debug] middleware: checking admin-email cookie: ${adminEmail}`);
+        console.log(`[auth-debug] proxy: checking admin-email cookie: ${adminEmail}`);
         try {
           response.headers.set('x-debug-cookie-lookup', 'attempting');
           const cookieUser = await getCurrentUserFromCookie(adminEmail);
@@ -309,17 +311,17 @@ export async function middleware(request: NextRequest) {
             userRole = cookieUser.role;
             isUserActive = cookieUser.is_active;
             authMethod = 'admin-email-cookie';
-            console.log(`[auth-debug] middleware: admin-email cookie auth successful: ${userEmail}, role: ${userRole}`);
+            console.log(`[auth-debug] proxy: admin-email cookie auth successful: ${userEmail}, role: ${userRole}`);
           } else {
             response.headers.set('x-debug-cookie-lookup', 'user-not-found');
-            console.log(`[auth-debug] middleware: admin-email cookie user not found: ${adminEmail}`);
+            console.log(`[auth-debug] proxy: admin-email cookie user not found: ${adminEmail}`);
           }
         } catch (error) {
           response.headers.set('x-debug-cookie-lookup', 'error');
-          console.error(`[auth-debug] middleware: error checking admin-email cookie:`, error);
+          console.error(`[auth-debug] proxy: error checking admin-email cookie:`, error);
         }
       } else {
-        console.log(`[auth-debug] middleware: no admin-email cookie found`);
+        console.log(`[auth-debug] proxy: no admin-email cookie found`);
       }
     }
 
@@ -329,7 +331,7 @@ export async function middleware(request: NextRequest) {
       response.headers.set('x-debug-checker-email', checkerEmail ? 'found' : 'not-found');
       
       if (checkerEmail) {
-        console.log(`[auth-debug] middleware: checking checker-email cookie: ${checkerEmail}`);
+        console.log(`[auth-debug] proxy: checking checker-email cookie: ${checkerEmail}`);
         try {
           // Check if user has checker_admin business role
           const { hasBusinessRole } = await import('./app/lib/rbac');
@@ -341,17 +343,17 @@ export async function middleware(request: NextRequest) {
             userRole = 'checker_admin';
             isUserActive = true;
             authMethod = 'checker-email-cookie';
-            console.log(`[auth-debug] middleware: checker-email cookie auth successful: ${userEmail}`);
+            console.log(`[auth-debug] proxy: checker-email cookie auth successful: ${userEmail}`);
           } else {
             response.headers.set('x-debug-checker-lookup', 'not-checker-admin');
-            console.log(`[auth-debug] middleware: checker-email cookie user not a checker admin: ${checkerEmail}`);
+            console.log(`[auth-debug] proxy: checker-email cookie user not a checker admin: ${checkerEmail}`);
           }
         } catch (error) {
           response.headers.set('x-debug-checker-lookup', 'error');
-          console.error(`[auth-debug] middleware: error checking checker-email cookie:`, error);
+          console.error(`[auth-debug] proxy: error checking checker-email cookie:`, error);
         }
       } else {
-        console.log(`[auth-debug] middleware: no checker-email cookie found`);
+        console.log(`[auth-debug] proxy: no checker-email cookie found`);
       }
     }
 
@@ -361,7 +363,7 @@ export async function middleware(request: NextRequest) {
     // 5. Decision logic (same as page guard)
     if (authMethod === 'none') {
       if (AUTH_TRACE) {
-        console.log(`[auth-debug] middleware: no valid session found`);
+        console.log(`[auth-debug] proxy: no valid session found`);
       }
       // No session, redirect to appropriate login page
       const loginPath = pathname.startsWith('/checker') ? '/checker/login' : '/admin/login';
@@ -385,7 +387,7 @@ export async function middleware(request: NextRequest) {
 
     if (!isUserActive) {
       if (AUTH_TRACE) {
-        console.log(`[auth-debug] middleware: user not active:`, userEmail);
+        console.log(`[auth-debug] proxy: user not active:`, userEmail);
       }
       // User not active, redirect to login
       const redirectResponse = NextResponse.redirect(
@@ -405,7 +407,7 @@ export async function middleware(request: NextRequest) {
       // Checker routes require checker_admin role
       if (userRole !== 'checker_admin') {
         if (AUTH_TRACE) {
-          console.log(`[auth-debug] middleware deny checker route`, { userEmail, userRole });
+          console.log(`[auth-debug] proxy deny checker route`, { userEmail, userRole });
         }
         const forbiddenResponse = new NextResponse("Forbidden", { status: 403 });
         forbiddenResponse.headers.set('x-admin-guard', 'deny:not-checker-admin');
@@ -417,7 +419,7 @@ export async function middleware(request: NextRequest) {
       const isSuperOnlyPath = pathname.startsWith('/admin/management');
       if (!isAdminRole || (isSuperOnlyPath && userRole !== 'super_admin')) {
         if (AUTH_TRACE) {
-          console.log(`[auth-debug] middleware deny admin route`, { userEmail, userRole, isSuperOnlyPath });
+          console.log(`[auth-debug] proxy deny admin route`, { userEmail, userRole, isSuperOnlyPath });
         }
         const forbiddenResponse = new NextResponse("Forbidden", { status: 403 });
         forbiddenResponse.headers.set('x-admin-guard', isSuperOnlyPath ? 'deny:super-only' : 'deny:not-admin');
@@ -432,7 +434,7 @@ export async function middleware(request: NextRequest) {
         const businessRoles = await getBusinessRoles(userEmail);
         if (!businessRoles.includes('user_profile')) {
           if (AUTH_TRACE) {
-            console.log(`[auth-debug] middleware: insufficient business role for management`, { userEmail, businessRoles });
+            console.log(`[auth-debug] proxy: insufficient business role for management`, { userEmail, businessRoles });
           }
           const redirectResponse = NextResponse.redirect(
             new URL('/admin/login?unauthorized=1', request.url),
@@ -443,7 +445,7 @@ export async function middleware(request: NextRequest) {
         }
       } catch (error) {
         if (AUTH_TRACE) {
-          console.log(`[auth-debug] middleware: business role check failed`, error);
+          console.log(`[auth-debug] proxy: business role check failed`, error);
         }
         // Continue with normal flow if business role check fails
       }
@@ -453,14 +455,14 @@ export async function middleware(request: NextRequest) {
     response.headers.set('x-admin-guard', `ok:${authMethod}`);
     
     if (AUTH_TRACE) {
-      console.log(`[auth-debug] middleware: allowing access (${authMethod})`);
+      console.log(`[auth-debug] proxy: allowing access (${authMethod})`);
     }
     
     return response;
 
   } catch (error) {
-    console.log(`[auth-debug] middleware: unexpected error:`, error);
-    console.log(`[auth-debug] middleware: error stack:`, error instanceof Error ? error.stack : 'No stack trace');
+    console.log(`[auth-debug] proxy: unexpected error:`, error);
+    console.log(`[auth-debug] proxy: error stack:`, error instanceof Error ? error.stack : 'No stack trace');
     // Unexpected error, redirect to login
     const redirectResponse = NextResponse.redirect(
       new URL(`/admin/login?next=${encodeURIComponent(pathname)}`, request.url),
@@ -476,8 +478,10 @@ export async function middleware(request: NextRequest) {
 }
 
 /**
- * Configure which routes to run middleware on
+ * Configure which routes to run proxy on
  * Exclude auth callback routes to prevent interference with authentication flow
+ * 
+ * Note: Config export format remains the same in Next.js 16, only filename changed
  */
 export const config = {
   matcher: [
@@ -486,3 +490,4 @@ export const config = {
     '/checker/((?!login|callback|verify).*)', // Exclude login, callback, and verify routes
   ],
 };
+
