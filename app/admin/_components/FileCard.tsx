@@ -114,7 +114,9 @@ export default function FileCard({
           try {
             const j = await r.json();
             code = j?.code ?? code;
-          } catch {}
+          } catch {
+            // Ignore JSON parse errors, use default code
+          }
           console.warn("[FileCard] presign failed", r.status, code);
           setUrl(null); // render placeholder "No file uploaded"
           return null;

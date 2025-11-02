@@ -321,6 +321,6 @@ function isValidEmail(email: string): boolean {
 }
 
 function isValidPhone(phone: string): boolean {
-  const phoneRegex = /^[\+]?[0-9\s\-\(\)]{8,15}$/;
+  const phoneRegex = /^[+]?[0-9\s\-()]{8,15}$/;
   return phoneRegex.test(phone);
 }

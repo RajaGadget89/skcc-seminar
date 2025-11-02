@@ -214,7 +214,6 @@ export default function CMSDashboard() {
               </p>
             </div>
             <div className="p-3 rounded-full bg-purple-100 dark:bg-purple-900/20">
-              {/* eslint-disable-next-line jsx-a11y/alt-text */}
               <Image className="h-6 w-6 text-purple-600 dark:text-purple-400" />
             </div>
           </div>
@@ -341,7 +340,6 @@ export default function CMSDashboard() {
 
           <div className="flex items-center space-x-3 p-3 rounded-lg bg-gray-50 dark:bg-gray-700">
             <div className="p-2 rounded-full bg-purple-100 dark:bg-purple-900/20">
-              {/* eslint-disable-next-line jsx-a11y/alt-text */}
               <Image className="h-4 w-4 text-purple-600 dark:text-purple-400" />
             </div>
             <div className="flex-1 min-w-0">

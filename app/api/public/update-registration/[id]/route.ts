@@ -173,7 +173,7 @@ export async function POST(
 
     // Update specific fields based on dimension
     switch (dimension) {
-      case "payment":
+      case "payment": {
         if (formData.paymentSlip) {
           // Handle file upload - this would need to be implemented
           // For now, we'll assume the file URL is provided
@@ -386,8 +386,9 @@ export async function POST(
           }
         }
         break;
+      }
 
-      case "profile":
+      case "profile": {
         // Update profile information fields
         if (formData.firstName) updateData.first_name = formData.firstName;
         if (formData.lastName) updateData.last_name = formData.lastName;
@@ -409,8 +410,9 @@ export async function POST(
         if (formData.profileImage)
           updateData.profile_image_url = formData.profileImage;
         break;
+      }
 
-      case "tcc":
+      case "tcc": {
         if (formData.chamberCard) {
           updateData.chamber_card_url = formData.chamberCard;
         }
@@ -418,6 +420,7 @@ export async function POST(
         if (formData.tccHolderName)
           updateData.tcc_holder_name = formData.tccHolderName;
         break;
+      }
     }
 
     // Update the review checklist to set the dimension back to pending

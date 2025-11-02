@@ -39,6 +39,7 @@ export function sanitizeFilename(filename: string): string {
     // Replace unsafe characters (including parentheses) with underscores
     .replace(/[<>:"|?*\\/()]/g, "_")
     // Replace Unicode characters with ASCII-safe equivalents
+    // eslint-disable-next-line no-control-regex
     .replace(/[^\x00-\x7F]/g, "_")
     // Replace multiple underscores with single underscore
     .replace(/_+/g, "_")

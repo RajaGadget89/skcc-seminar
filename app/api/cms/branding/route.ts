@@ -11,9 +11,23 @@ export async function GET(_request: NextRequest) {
         `id, logo_desktop_url, logo_mobile_url, logo_favicon_url, brand_colors`,
       )
       .eq("is_active", true)
-      .single();
+      .maybeSingle();
 
+    // Handle case where no active branding exists (not an error)
     if (error) {
+      // PGRST116 means no rows found, which is acceptable for public endpoints
+      if (error.code === "PGRST116") {
+        return new NextResponse(JSON.stringify({ branding: null }), {
+          status: 200,
+          headers: {
+            "Content-Type": "application/json",
+            "Cache-Control":
+              "no-store, no-cache, must-revalidate, proxy-revalidate",
+            Pragma: "no-cache",
+            Expires: "0",
+          },
+        });
+      }
       return NextResponse.json(
         { error: "Failed to load branding" },
         {

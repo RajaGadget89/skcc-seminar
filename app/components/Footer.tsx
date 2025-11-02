@@ -108,7 +108,9 @@ export default function Footer() {
           const footerData = await footerRes.json();
           setFooterContent(footerData.footer || null);
         }
-      } catch (_) {}
+      } catch {
+        // Ignore footer fetch errors
+      }
     };
 
     // Use requestIdleCallback to avoid blocking hydration

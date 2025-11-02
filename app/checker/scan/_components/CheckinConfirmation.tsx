@@ -152,8 +152,8 @@ export default function CheckinConfirmation({
                     )}
                     <p className="mt-2 font-medium">
                       {userInfo.isEventTypeRestricted
-                        ? "Please select a different event type or verify the user\'s badge status."
-                        : "Please select a different event or verify the user\'s check-in status."}
+                        ? "Please select a different event type or verify the user's badge status."
+                        : "Please select a different event or verify the user's check-in status."}
                     </p>
                   </div>
                 </div>

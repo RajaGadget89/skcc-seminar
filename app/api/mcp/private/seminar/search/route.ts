@@ -277,7 +277,7 @@ export async function GET(request: NextRequest) {
     // Mobile phone lookup (exact or partial match)
     if (mobilePhone) {
       // Remove common formatting characters
-      const cleanPhone = mobilePhone.replace(/[\s\-\(\)]/g, "");
+      const cleanPhone = mobilePhone.replace(/[\s\-()]/g, "");
       query = query.ilike("mobile_phone", `%${cleanPhone}%`);
     }
 

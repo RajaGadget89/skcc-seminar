@@ -1178,7 +1178,9 @@ export default function RegistrationForm() {
                               );
                               setCopiedKey("acct");
                               setTimeout(() => setCopiedKey(null), 1200);
-                            } catch {}
+                            } catch {
+                              // Ignore clipboard copy errors
+                            }
                           }}
                           className="px-3 py-1.5 text-xs md:text-sm rounded-md bg-blue-600/10 text-blue-700 border border-blue-200 hover:bg-blue-600/15"
                         >

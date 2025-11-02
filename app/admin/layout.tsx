@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { BarChart3, Home, Shield, UserCheck } from "lucide-react";
+import { BarChart3, Home, UserCheck } from "lucide-react";
 import Footer from "../components/Footer";
 import AdminUserInfoClient from "./_components/AdminUserInfoClient";
 import { EmailOutboxNavWidget } from "./_components/EmailOutboxNavWidget";
@@ -123,7 +123,8 @@ export default async function AdminLayout({
                 <span className="font-semibold">Admin</span>
               </Link>
               <div className="w-px h-6 bg-gradient-to-b from-gray-300 to-transparent dark:from-gray-600"></div>
-              {false && (
+              {/* Temporarily disabled audit link - remove when ready to enable */}
+              {/* {false && (
                 <>
                   <Link
                     href="/admin/audit"
@@ -136,7 +137,7 @@ export default async function AdminLayout({
                   </Link>
                   <div className="w-px h-6 bg-gradient-to-b from-gray-300 to-transparent dark:from-gray-600"></div>
                 </>
-              )}
+              )} */}
 
               {/* Check-in System - All Admins */}
               {checkinEnabled && (

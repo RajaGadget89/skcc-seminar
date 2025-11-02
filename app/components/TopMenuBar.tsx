@@ -47,7 +47,9 @@ export default function TopMenuBar() {
           const data = await res.json();
           setBranding(data.branding || null);
         }
-      } catch (_) {}
+      } catch {
+        // Ignore branding fetch errors
+      }
     };
 
     // Use requestIdleCallback to avoid blocking hydration

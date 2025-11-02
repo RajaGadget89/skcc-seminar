@@ -89,11 +89,12 @@ export class FormPricingCalculator {
 
       // Calculate base price based on pricing type
       switch (config.pricing_type) {
-        case "fixed":
+        case "fixed": {
           basePrice = config.fixed_price || 0;
           break;
+        }
 
-        case "tiered":
+        case "tiered": {
           const tierResult = this.calculateTieredPricing(
             config.tiered_pricing?.tiers || [],
             quantity,
@@ -101,8 +102,9 @@ export class FormPricingCalculator {
           basePrice = tierResult.price;
           appliedTier = tierResult.tierName;
           break;
+        }
 
-        case "early_bird":
+        case "early_bird": {
           const earlyBirdResult = this.calculateEarlyBirdPricing(
             config.early_bird_pricing!,
             quantity,
@@ -110,6 +112,7 @@ export class FormPricingCalculator {
           basePrice = earlyBirdResult.price;
           isEarlyBird = earlyBirdResult.isEarlyBird;
           break;
+        }
 
         default:
           throw new Error(`Unknown pricing type: ${config.pricing_type}`);

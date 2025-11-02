@@ -299,7 +299,9 @@ export async function generateYECBadge(badgeData: BadgeData): Promise<Buffer> {
     ctx.setLineDash([10, 8]);
     ctx.strokeRect(inset, inset, width - inset * 2, height - inset * 2);
     ctx.restore();
-  } catch {}
+  } catch {
+    // Ignore border drawing errors, continue with badge generation
+  }
 
   console.log("✅ Badge generation completed successfully");
   return canvas.toBuffer("image/png");

@@ -70,7 +70,9 @@ export default function ImportData({
             new Date(data.updatedAt || Date.now()).toLocaleTimeString(),
           );
         }
-      } catch {}
+      } catch {
+        // Ignore polling errors, continue with current state
+      }
     };
     // fire immediately, then every 2s
     poll();

@@ -61,7 +61,7 @@ const SOCIAL_ICONS = [
   "Share2",
 ];
 
-export default function FooterManagement({}: FooterManagementProps) {
+export default function FooterManagement(_props: FooterManagementProps) {
   const [config, setConfig] = useState<FooterConfig>({});
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);

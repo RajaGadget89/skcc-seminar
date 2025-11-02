@@ -518,7 +518,9 @@ export async function GET(request: NextRequest) {
         responseBytes: JSON.stringify(response).length,
         requestId,
       });
-    } catch {}
+    } catch {
+      // Ignore analytics logging errors
+    }
 
     return res;
   } catch (_error) {

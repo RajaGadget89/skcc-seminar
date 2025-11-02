@@ -38,24 +38,22 @@ export const GET = withAuditLogging(async (req: NextRequest) => {
     console.error("[PRICING_OPTIONS_API] Error:", error);
 
     if (error instanceof Error) {
-      if (error.message.includes("Event settings not found")) {
-        return NextResponse.json(
-          {
-            error: "Event settings not found",
-            code: "EVENT_SETTINGS_NOT_FOUND",
-          },
-          { status: 500 },
+      // If it's a database/configuration error, return default empty options
+      // This allows the landing page to still function when settings aren't configured
+      if (
+        error.message.includes("Event settings") ||
+        error.message.includes("Pricing configuration") ||
+        error.message.includes("Failed to fetch event settings")
+      ) {
+        console.warn(
+          "[PRICING_OPTIONS_API] Event settings not configured, returning default options",
         );
-      }
-
-      if (error.message.includes("Pricing configuration not found")) {
-        return NextResponse.json(
-          {
-            error: "Pricing configuration not found",
-            code: "CONFIG_NOT_FOUND",
-          },
-          { status: 500 },
-        );
+        return NextResponse.json({
+          hotelChoices: ["no-accommodation"],
+          roomTypes: [],
+          allowInQuotaAfterEarlyBird: false,
+          isEarlyBird: false,
+        });
       }
 
       return NextResponse.json(
